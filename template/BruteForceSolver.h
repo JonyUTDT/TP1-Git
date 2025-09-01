@@ -6,6 +6,7 @@
 
 class BruteForceSolver {
 private:
+   // Solution _bf;
 
 public:
     BruteForceSolver();
