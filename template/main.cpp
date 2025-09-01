@@ -7,29 +7,31 @@
 #include <vector>
 
 int main() {
+
 // 1. Crear instancia y cargar manualmente influencers
     Instance inst = {};
-    inst.loadFromFile("C:/Users/juani/OneDrive/Documentos/Di Tella/2025/TD V/templatetp1/template/selected_instances/prueba.txt");
+    inst.loadFromFile("C:\\Users\\jonyj\\OneDrive\\UTDT\\UTDT\\2025\\2do Semestre\\TD V\\TPs\\TP1-Prueba-Solucion-Mia\\template\\selected_instances\\Prueba.txt");
     Solution sol(3);
-    std::cout << "Cargando archivo..." << std::endl;
+    cout << "Cargando archivo..." << endl;
 
-    // 3. Probar agregar influencers válidos
+// 2. Probar agregar influencers válidos
     sol.addInfluencer(6, inst); // no debería insertarlo
     sol.addInfluencer(1, inst); // debería insertarlo
     sol.addInfluencer(3, inst);
     sol.addInfluencer(1, inst); // debería mostrar "Ya está en el diccionario ó no es válido"
 
-    // 4. Probar agregar un influencer inválido (no está en Instance)
+// 3. Probar agregar un influencer inválido (no está en Instance)
     sol.addInfluencer(5, inst); // debería mostrar "Ya está en el diccionario ó no es válido"
-
+    
     sol.printSolution();
 
-    // 5. Probar eliminar influencers
-    sol.removeInfluencer(3); // debería eliminarlo
-    sol.removeInfluencer(4); // debería mostrar "No está en el diccionario"
+// 4. Probar eliminar influencers
+    sol.removeInfluencer(3, inst); // debería eliminarlo
+    sol.removeInfluencer(4, inst); // debería mostrar "No está en el diccionario"
     
     sol.printSolution();
     return 0;
+
 }
 
 /*

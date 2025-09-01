@@ -2,69 +2,87 @@
 #include <iostream>
 #include <algorithm>
 #include <set>
+
 using namespace std;
 
 Solution::Solution(int numInfluencers) {
-    _solution = {};
-    _costos = vector<int>(numInfluencers, 0); //inicializo vector de costos con ceros
+
+    _costoTotal = 0; // Inicializo el costo total en 0
+    _segmentosCubiertos = {}; // Inicializo los segmentos cubiertos en cero
+    _influencersUsados = vector<int>(numInfluencers, 0); // Inicializa el vector de influencers usados con todas las posiciones en cero, no tengo ningun influencer
+
 }
 
-void Solution::addInfluencer(int influencer) {
-    //NECESITO CHEQUEAR QUE EL INFLUENCER SEA VALIDO??? 
-    _solution[influencer] = _costos[influencer]; //agrego el influencer al subconjunto
-}
+void Solution::addInfluencer(int influencer, const Instance& inst) {
 
-void Solution::removeInfluencer(int influencer) {
-    if (find(_solution.begin(), _solution.end(), influencer) != _solution.end()) { // si está en el subconjunto
-        _solution.erase(_solution.begin() + influencer);
-    }else{
-        cout << "El influencer: " << influencer << " no esta en el diccionario" << endl;
+    if ((_influencersUsados[influencer] == 0) && (inst.hasInfluencer(influencer))) { 
+
+        // si NO está en el subconjunto y SÍ es un influencer válido
+        _influencersUsados[influencer] = 1; // lo agrego al vector de influencers usados
+        _segmentosCubiertos.insert(inst.getInfluencer(influencer).second.begin(), inst.getInfluencer(influencer).second.end()); // agrego los segmentos cubiertos
+        _costoTotal = _costoTotal + inst.getInfluencer(influencer).first; // actualizo el costo total
+
+    } else if ((_influencersUsados[influencer] == 0) && !(inst.hasInfluencer(influencer))) {
+
+        cout << "El influencer: " << influencer << " No es valido" << endl;
+
+    } else {
+
+        cout << "El influencer: " << influencer << " Ya esta en el diccionario" << endl;
+    
     }
+
+}
+
+void Solution::removeInfluencer(int influencer, const Instance& inst) {
+
+    if (_influencersUsados[influencer] == 1) { 
+        
+        _influencersUsados[influencer] = 0;
+        _costoTotal -= inst.getInfluencer(influencer).first;
+
+        // Reconstruir los segmentos cubiertos desde cero
+        _segmentosCubiertos.clear();
+        for (size_t i = 0; i < _influencersUsados.size(); i++) {
+            if (_influencersUsados[i] == 1) {
+                _segmentosCubiertos.insert(
+                    inst.getInfluencer(i).second.begin(),
+                    inst.getInfluencer(i).second.end()
+                );
+            }
+        }
+
+    } else {
+
+        cout << "El influencer: " << influencer << " No esta en el diccionario" << endl;
+    
+    }
+
 }
 
 bool Solution::containsInfluencer(int influencer) const {
-    if (find(_solution.begin(), _solution.end(), influencer) != _solution.end()) { // si está en el subconjunto
+
+    if (_influencersUsados[influencer] == 1) {
         return true;
     } else {
         return false;
     }
+
 }
 
 void Solution::printSolution() const {
-    cout << "Solución actual:" << endl;
-    for (size_t i = 0; i < _solution.size(); i++) {
-        cout << "Influencer " << i << ": costo = " << _solution[i] << endl;
+
+    cout << "Solucion actual:" << endl;
+    cout << "Influencers usados: ";
+    for (size_t i = 0; i <= _influencersUsados.size(); ++i) {
+        if (_influencersUsados[i] == 1) {
+            cout << i << " ";
+        }
     }
+    cout << endl;
+    cout << "Costo total: " << _costoTotal << endl;
+    cout << "Segmentos cubiertos: { ";
+    for (int s : _segmentosCubiertos) cout << s << " ";
+    cout << "}" << endl;
+
 }
-
-/*
-    // 1. Crear instancia y cargar manualmente influencers
-    Instance inst = {};
-    inst.loadFromFile("C:/Users/juani/OneDrive/Documentos/Di Tella/2025/TD V/templatetp1/template/selected_instances/prueba.txt");
-    Solution sol(3);
-    std::cout << "Cargando archivo..." << std::endl;
-
-    // 3. Probar agregar influencers válidos
-    sol.addInfluencer(6, inst); // no debería insertarlo
-    sol.addInfluencer(1, inst); // debería insertarlo
-    sol.addInfluencer(3, inst);
-    sol.addInfluencer(0, inst); // debería mostrar "Ya está en el diccionario ó no es válido"
-
-    // 4. Probar agregar un influencer inválido (no está en Instance)
-    sol.addInfluencer(5, inst); // debería mostrar "Ya está en el diccionario ó no es válido"
-
-    sol.printSolution();
-
-    // 5. Probar eliminar influencers
-    sol.removeInfluencer(3); // debería eliminarlo
-    sol.removeInfluencer(4); // debería mostrar "No está en el diccionario"
-    
-    sol.printSolution();
-    return 0;
-}
-
-if ((_solution.find(influencer) == _solution.end()) && (inst.hasInfluencer(influencer))) { 
-        // si  está en el subconjunto y SÍ es un influencer válido lo pisa
-        _solution.at(influencer) = {inst.getInfluencer(influencer).first, inst.getInfluencer(influencer).second}; 
-
-*/
